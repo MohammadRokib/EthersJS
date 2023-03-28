@@ -50,6 +50,36 @@ async function main() {
     // -- using the map
         const personNumber = await contract.nameToNum("Khatami");
         console.log (`Person's favorite number: ${personNumber}`);
+    
+    // Compiling StorageFactory.sol
+        const abiSF = fs.readFileSync("./StorageFactory_sol_StorageFactory.abi", "utf-8");
+        const binSF = fs.readFileSync("./StorageFactory_sol_StorageFactory.bin", "utf-8");
+
+        const contractFactorySF = new ethers.ContractFactory(abiSF, binSF, wallet);
+        console.log ("Deploying Please wait...");
+        const contractSF = await contractFactorySF.deploy();
+        await contractSF.deployTransaction.wait(1);
+    
+    // Interacting with StorageFactory.sol --createSSArray function
+        const createSSArraySFResponse = await contractSF.createSSArray();
+        const createSSArraySFReceipt = await createSSArraySFResponse.wait(1);
+        // console.log (createSSArraySFReceipt);
+    
+    // --ssArray
+        const ssArraySF = await contractSF.ssArray("0");
+        console.log (`Contract address: ${ssArraySF}`);
+
+    // --sfStore
+        const sfStoreResponse = await contractSF.sfStore("0", "1234567");
+        const sfStoreReceipt = await sfStoreResponse.wait(1);
+        // console.log (sfStoreReceipt);
+
+    // --sfGet
+        const sfNum = await contractSF.sfGet("0");
+        console.log (`StorageFactory Number: ${sfNum}`);
+
+
+
 }
 
 main()
